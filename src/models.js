@@ -53,8 +53,28 @@ const CourseSchema = new Schema({
     }]
 });
 
+const ReviewSchema = new Schema({
+    user: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
+    },
+    postedOn: {
+        type: Date,
+        default: Date.now
+    },
+    rating: {
+        type: Number,
+        required: true,
+        min: 1,
+        max: 5
+    },
+    review: String
+});
+
 const User = mongoose.model('User', UserSchema);
 const Course = mongoose.model('Course', CourseSchema);
+const Review = mongoose.model('Review', ReviewSchema);
 
 module.exports.User = User;
 module.exports.Course = Course;
+module.exports.Review = Review;
