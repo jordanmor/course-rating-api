@@ -5,7 +5,6 @@ const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
 const users = require('./routes/users');
-const reviews = require('./routes/reviews');
 const courses = require('./routes/courses');
 const app = express();
 
@@ -34,7 +33,6 @@ app.use(express.urlencoded({ extended: true }));
 // app.use(express.static('public'));
 
 app.use('/api/users', users);
-app.use('/api/reviews', reviews);
 app.use('/api/courses', courses);
 
 // send a friendly greeting for the root route
