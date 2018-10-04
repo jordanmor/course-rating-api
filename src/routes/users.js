@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const models = require('../models');
-const { User } = models;
+const { User } = require('../models/user');
 
 router.get('/', (req, res) => {
     res.send('User');
