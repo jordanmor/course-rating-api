@@ -3,33 +3,33 @@ const Schema = mongoose.Schema;
 
 const CourseSchema = new Schema({
   user: {
-      type: Schema.Types.ObjectId, 
-      ref: 'User'  
+    type: Schema.Types.ObjectId, 
+    ref: 'User'  
   },
   title: {
-      type: String,
-      required: [true, 'Course title is required']
+    type: String,
+    required: [true, 'Course title is required']
   },
   description: {
-      type: String,
-      required: [true, 'A course description is required']
+    type: String,
+    required: [true, 'A course description is required']
   },
   estimatedTime: String,
   materialsNeeded: String,
   steps: [{
-      stepNumber: Number,
-      title: {
-          type: String,
-          required: true
-      },
-      description: {
-          type: String,
-          required: true
-      }
+    stepNumber: Number,
+    title: {
+      type: String,
+      required: true
+    },
+    description: {
+      type: String,
+      required: true
+    }
   }],
   reviews: [{
-      type: Schema.Types.ObjectId,
-      ref: 'Review'
+    type: Schema.Types.ObjectId,
+    ref: 'Review'
   }]
 });
 
