@@ -3,7 +3,7 @@ The back end for a "Course Rating Application" which lets users create, edit and
 The API will provide a way for users to review educational courses: users can see a list of courses in a database; add courses to the database; and add reviews for a specific course.  
 Built using Express and MongoDB.  
 
-Treehouse Full Stack JavaScript Techdegree - Project 10
+Treehouse Full Stack JavaScript Techdegree - Project 11
 
 **Main Project Goals**
   - Set up a connection to your MongoDB database using Mongoose
