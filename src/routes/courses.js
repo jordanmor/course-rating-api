@@ -5,7 +5,7 @@ const { Course } = require('../models/course');
 const { Review } = require('../models/review');
 const { User } = require('../models/user');
 
-
+// GET / - get all available courses from database
 router.get('/', async (req, res) => {
   const courses = await Course.find().select('title');
   if (!courses) {
@@ -16,9 +16,10 @@ router.get('/', async (req, res) => {
   res.send(courses);
 });
 
-router.post('/', mid.checkAuthorization, (req, res, next) => {
+// POST / - create a new course - requires proper authorization
+router.post('/', mid.authorizeUser, (req, res, next) => {
   // Add current authorized user's id to request body
-  req.body.user = req.currentAuthUser._id;
+  req.body.user = req.user._id;
   const course = new Course(req.body);
   course.save((err, course) => {
     if (err) {
@@ -29,6 +30,7 @@ router.post('/', mid.checkAuthorization, (req, res, next) => {
   });
 });
 
+// GET /:courseId - create a new course (requires proper authorization)
 router.get('/:courseId', (req, res, next) => {
   Course
     .findById(req.params.courseId)
@@ -49,13 +51,14 @@ router.get('/:courseId', (req, res, next) => {
     });
 });
 
-router.put('/:courseId', mid.checkAuthorization, (req, res, next) => {
+// PUT /:courseId - update course (requires proper authorization)
+router.put('/:courseId', mid.authorizeUser, (req, res, next) => {
   
   Course
     .findById(req.params.courseId)
     .then(course => {
       // Users can only update their own courses
-      course.validateUser(course.user, req.currentAuthUser, function(err) {
+      course.validateUser(course.user, req.user, function(err) {
         if(err) {
           return next(err);
         } else {
@@ -71,16 +74,17 @@ router.put('/:courseId', mid.checkAuthorization, (req, res, next) => {
     });
 });
 
-router.post('/:courseId/reviews', mid.checkAuthorization, (req, res, next) => {
+// PUT /:courseId/reviews - create a review (requires proper authorization)
+router.post('/:courseId/reviews', mid.authorizeUser, (req, res, next) => {
 
   Course
     .findById(req.params.courseId)
     .populate('reviews')
-    .populate('user', '_id fullName')
+    .populate('user', '_id fullName') // deep population
     .then(course => {
 
       // Add current authorized user's id to request body
-      req.body.user = req.currentAuthUser._id;
+      req.body.user = req.user._id;
 
       const review = new Review(req.body);
 

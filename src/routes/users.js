@@ -3,16 +3,12 @@ const router = express.Router();
 const mid = require('../middleware');
 const { User } = require('../models/user');
 
-router.get('/', mid.checkAuthorization, (req, res) => {
-
-  const currentAuthUser = {
-    _id: req.currentAuthUser._id,
-    fullName: req.currentAuthUser.fullName,
-    emailAddress: req.currentAuthUser.emailAddress
-  };
-  res.status(200).send(currentAuthUser);
+// GET / return currently authenticated user
+router.get('/', mid.authorizeUser, (req, res) => {
+  res.status(200).send(req.user);
 });
 
+// POST / create new user
 router.post('/', function(req, res, next) {
     // Confirm that user typed same password twice
     if (req.body.password !== req.body.confirmPassword) {
@@ -21,13 +17,13 @@ router.post('/', function(req, res, next) {
       return next(err);
     }
 
-    // Create an instance of a user and save document to Mongo
+    // Create an instance of a user
     const user = new User({
-      emailAddress: req.body.emailAddress,
       fullName: req.body.fullName,
+      emailAddress: req.body.emailAddress,
       password: req.body.password
     });
-
+    // Save document to MongoDB
     user.save((err, user) => {
       if (err) {
         err.status = 400;

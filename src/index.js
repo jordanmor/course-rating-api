@@ -7,14 +7,13 @@ const users = require('./routes/users');
 const courses = require('./routes/courses');
 const app = express();
 
-// set our port
 app.set('port', process.env.PORT || 5000);
 
-// morgan gives us http request logging
+// Http request logging from Morgan
 app.use(morgan('dev'));
 
 //Mongoose connection
-mongoose.connect('mongodb://localhost/course-api', { useNewUrlParser: true });
+mongoose.connect('mongodb://localhost:27017/course-api', { useNewUrlParser: true });
 
 const db = mongoose.connection;
 
@@ -29,26 +28,25 @@ db.once('open', () => {
 // TODO add additional routes here
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); 
-// app.use(express.static('public'));
 
 app.use('/api/users', users);
 app.use('/api/courses', courses);
 
-// send a friendly greeting for the root route
+// Send a friendly greeting for the root route
 app.get('/', (req, res) => {
   res.json({
     message: 'Welcome to the Course Review API'
   });
 });
 
-// catch 404 and forward to error handler
+// Catch 404 and forward to error handler
 app.use(function(req, res, next) {
   var err = new Error('File Not Found');
   err.status = 404;
   next(err);
 });
 
-// global error handler
+// Global error handler
 app.use((err, req, res, next) => {
   // console.error(err.stack);
   res.status(err.status || 500).json({
@@ -57,7 +55,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-// start listening on our port
+// Start listening on our port
 const server = app.listen(app.get('port'), () => {
   console.log(`Express server is listening on port ${server.address().port}`);
 });
