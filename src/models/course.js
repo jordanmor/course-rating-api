@@ -33,6 +33,18 @@ const CourseSchema = new Schema({
   }]
 });
 
+// Users can only update their own courses
+CourseSchema.method('validateUser', function(courseCreator, user, callback) {
+  // compare ObjectIDs with Mongoose's .equals() method
+  if (!courseCreator._id.equals(user._id)) {
+    const err = new Error('You are not authorized to update this course');
+    err.status = 401;
+    callback(err);
+  } else {
+    callback();
+  }
+});
+
 const Course = mongoose.model('Course', CourseSchema);
 
 module.exports.Course = Course;

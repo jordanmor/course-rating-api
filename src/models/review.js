@@ -23,7 +23,7 @@ ReviewSchema.method('validateUser', function(courseUser, reviewer, callback) {
   // compare ObjectIDs with Mongoose's .equals() method
   if (courseUser._id.equals(reviewer._id)) {
     const err = new Error('Users cannot review their own course.');
-    err.status = 400;
+    err.status = 401;
     callback(err);
   } else {
     callback();

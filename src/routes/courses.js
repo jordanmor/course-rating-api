@@ -50,16 +50,37 @@ router.get('/:courseId', (req, res, next) => {
 });
 
 router.put('/:courseId', mid.checkAuthorization, (req, res, next) => {
-  Course.findOneAndUpdate(
-    { _id: req.params.courseId }, 
-    req.body,
-    { runValidators: true },
-    (err, course) => {
-      if(err) {
-        err.status = 400;
-        return next(err);
-      }
-      res.status(204).end();
+  // Course.findOneAndUpdate(
+  //   { _id: req.params.courseId }, 
+  //   req.body,
+  //   { runValidators: true },
+  //   (err, course) => {
+  //     if(err) {
+  //       err.status = 400;
+  //       return next(err);
+  //     }
+  //     res.status(204).end();
+  //   });
+  Course
+    .findById(req.params.courseId)
+    .then(course => {
+      // Users can only update their own courses
+      course.validateUser(course.user, req.currentAuthUser, function(err) {
+        if(err) {
+          return next(err);
+        } else {
+          course.update(
+            req.body,
+            { runValidators: true, context: 'query' }, 
+            function(err, result){
+              if(err) {
+                return next(err);
+              } else {
+                res.status(204).end();
+              }
+          });
+        }
+      });
     });
 });
 
