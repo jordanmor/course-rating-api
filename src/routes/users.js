@@ -1,10 +1,16 @@
 const express = require('express');
 const router = express.Router();
+const mid = require('../middleware');
 const { User } = require('../models/user');
 
-router.get('/', async (req, res) => {
-  const users = await User.find();
-  res.send(users);
+router.get('/', mid.checkAuthorization, (req, res) => {
+
+  const currentAuthUser = {
+    _id: req.currentAuthUser._id,
+    fullName: req.currentAuthUser.fullName,
+    emailAddress: req.currentAuthUser.emailAddress
+  };
+  res.status(200).send(currentAuthUser);
 });
 
 router.post('/', function(req, res, next) {
