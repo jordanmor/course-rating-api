@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const mid = require('../middleware');
 const { Course } = require('../models/course');
 const { Review } = require('../models/review');
 const { User } = require('../models/user');
@@ -10,7 +11,9 @@ router.get('/', async (req, res) => {
   res.send(courses);
 });
 
-router.post('/', (req, res, next) => {
+router.post('/', mid.checkAuthorization, (req, res, next) => {
+  // Add current authorized user's id to request body
+  req.body.user = req.currentAuthUser._id;
   const course = new Course(req.body);
   course.save((err, course) => {
     if (err) {
@@ -41,7 +44,7 @@ router.get('/:courseId', (req, res, next) => {
     });
 });
 
-router.put('/:courseId', (req, res, next) => {
+router.put('/:courseId', mid.checkAuthorization, (req, res, next) => {
   Course.findOneAndUpdate(
     { _id: req.params.courseId }, 
     req.body, 
@@ -54,29 +57,42 @@ router.put('/:courseId', (req, res, next) => {
     });
 });
 
-router.post('/:courseId/reviews', async (req, res, next) => {
+router.post('/:courseId/reviews', mid.checkAuthorization, (req, res, next) => {
 
-  const course = await Course
+  Course
     .findById(req.params.courseId)
     .populate('reviews')
-    .populate('user', '_id fullName');
-
-  const review = new Review(req.body);
-  course.reviews.push(review);
-
-  course.save((err, course) => {
-    if (err) {
-      err.status = 400;
-      return next(err);
-    }
-    review.save((err, course) => {
-      if (err) {
+    .populate('user', '_id fullName')
+    .then(course => {
+      // Prevent users from reviewing their own course
+      // compare ObjectIDs with the Mongoose's .equals() method
+      if (course.user._id.equals(req.currentAuthUser._id)) {
+        const err = new Error('Users can not review their own course.');
         err.status = 400;
         return next(err);
-      }
-    });
-    res.location(`/api/courses/${req.params.courseId}`).status(201).end();
-  });
+      } 
+
+      // Add current authorized user's id to request body
+      req.body.user = req.currentAuthUser._id;
+
+      const review = new Review(req.body);
+      course.reviews.push(review);
+    
+      review.save((err, review) => {
+        if (err) {
+          err.status = 400;
+          return next(err);
+        }
+        course.save((err, course) => {
+          if (err) {
+            err.status = 400;
+            return next(err);
+          } else {
+            res.location(`/api/courses/${req.params.courseId}`).status(201).end();
+          }
+        });
+      });
+    }).catch(err => console.log(err));
 });
 
 module.exports = router;
