@@ -1,6 +1,5 @@
 'use strict';
 
-// load modules
 const express = require('express');
 const morgan = require('morgan');
 const mongoose = require('mongoose');
@@ -42,21 +41,16 @@ app.get('/', (req, res) => {
   });
 });
 
-// uncomment this route in order to test the global error handler
-// app.get('/error', function (req, res) {
-//   throw new Error('Test error');
-// });
-
-// send 404 if no other route matched
-app.use((req, res) => {
-  res.status(404).json({
-    message: 'Route Not Found'
-  })
-})
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  var err = new Error('File Not Found');
+  err.status = 404;
+  next(err);
+});
 
 // global error handler
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  // console.error(err.stack);
   res.status(err.status || 500).json({
     message: err.message,
     error: {}
