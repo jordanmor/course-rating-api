@@ -8,6 +8,11 @@ const { User } = require('../models/user');
 
 router.get('/', async (req, res) => {
   const courses = await Course.find().select('title');
+  if (!courses) {
+    const err = new Error('No courses in database.');
+    err.status = 404;
+    return next(err);
+  }
   res.send(courses);
 });
 
@@ -95,7 +100,11 @@ router.post('/:courseId/reviews', mid.checkAuthorization, (req, res, next) => {
         }
       });
     
-    }).catch(err => console.log(err));
+    }).catch(err => {
+      err.message = 'The course with the given ID was not found.';
+      err.status = 404;
+      next(err);
+    });
 });
 
 module.exports = router;
