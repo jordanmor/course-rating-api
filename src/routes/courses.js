@@ -47,7 +47,8 @@ router.get('/:courseId', (req, res, next) => {
 router.put('/:courseId', mid.checkAuthorization, (req, res, next) => {
   Course.findOneAndUpdate(
     { _id: req.params.courseId }, 
-    req.body, 
+    req.body,
+    { runValidators: true },
     (err, course) => {
       if(err) {
         err.status = 400;
@@ -64,34 +65,36 @@ router.post('/:courseId/reviews', mid.checkAuthorization, (req, res, next) => {
     .populate('reviews')
     .populate('user', '_id fullName')
     .then(course => {
-      // Prevent users from reviewing their own course
-      // compare ObjectIDs with the Mongoose's .equals() method
-      if (course.user._id.equals(req.currentAuthUser._id)) {
-        const err = new Error('Users can not review their own course.');
-        err.status = 400;
-        return next(err);
-      } 
 
       // Add current authorized user's id to request body
       req.body.user = req.currentAuthUser._id;
 
       const review = new Review(req.body);
-      course.reviews.push(review);
-    
-      review.save((err, review) => {
-        if (err) {
-          err.status = 400;
+
+      // Prevent users from reviewing their own course
+      review.validateUser(course.user, review.user, function(err) {
+        if(err) {
           return next(err);
+        } else {
+          review.save((err, review) => {
+            if (err) {
+              err.status = 400;
+              return next(err);
+            } else {
+              course.reviews.push(review);
+              course.save((err, course) => {
+                if (err) {
+                  err.status = 400;
+                  return next(err);
+                } else {
+                  res.location(`/api/courses/${req.params.courseId}`).status(201).end();
+                }
+              });
+            }
+          });
         }
-        course.save((err, course) => {
-          if (err) {
-            err.status = 400;
-            return next(err);
-          } else {
-            res.location(`/api/courses/${req.params.courseId}`).status(201).end();
-          }
-        });
       });
+    
     }).catch(err => console.log(err));
 });
 

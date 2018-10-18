@@ -19,6 +19,17 @@ const ReviewSchema = new Schema({
   review: String
 });
 
+ReviewSchema.method('validateUser', function(courseUser, reviewer, callback) {
+  // compare ObjectIDs with Mongoose's .equals() method
+  if (courseUser._id.equals(reviewer._id)) {
+    const err = new Error('Users cannot review their own course.');
+    err.status = 400;
+    callback(err);
+  } else {
+    callback();
+  }
+});
+
 const Review = mongoose.model('Review', ReviewSchema);
 
 module.exports.Review = Review;
