@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "start": "nodemon ./src/index.js localhost 5000",
-    "test": "mocha"
+    "test": "mocha",
+    "import": "cd ./seed-data && mongoimport --db course-api --collection courses --type=json --jsonArray --file courses.json && mongoimport --db course-api --collection users --type=json --jsonArray --file users.json && mongoimport --db course-api --collection reviews --type=json --jsonArray --file reviews.json"
   },
   "author": "",
   "license": "ISC",
