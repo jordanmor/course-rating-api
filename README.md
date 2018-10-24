@@ -17,6 +17,9 @@ Treehouse Full Stack JavaScript Techdegree - Project 11
 * Write tests for stated user stories
 * Use Mongoose deep population to return only user's name and hide user's other private details
 
+**Project Completed:** 10/23/2018  
+**Grade:** Exceeds Expectations
+
 ---
 ## Installation Instructions:
 1. git clone https://github.com/jordanmor/course-rating-api
