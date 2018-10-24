@@ -10,12 +10,6 @@ router.get('/', mid.authorizeUser, (req, res) => {
 
 // POST / create new user
 router.post('/', function(req, res, next) {
-    // Confirm that user typed same password twice
-    if (req.body.password !== req.body.confirmPassword) {
-      const err = new Error('Passwords do not match.');
-      err.status = 400;
-      return next(err);
-    }
 
     // Create an instance of a user
     const user = new User({
